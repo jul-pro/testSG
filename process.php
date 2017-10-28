@@ -1,9 +1,6 @@
 <?php
 	require_once("config.php");
 	
-	// populate_gbook();
-
-
 
 	if(isset($_GET["captcha"])) {
 		
@@ -12,19 +9,40 @@
 		// Else echo '0' as a string
 		else
 			echo 'false';
-	} elseif($_POST) {
+	}
+
+	if($_POST) {
 		
-		if(isset($_POST["refresh"])) {
+		if(strtoupper($_POST["captcha"]) != $_SESSION['captcha_id']) {
+			exit("Invalid captcha!");
+
+		} else {
+
+			if(!isset($_POST["u_name"]) || trim($_POST["u_name"]) == "") {
+
+				exit("Empty name!");
+
+			} elseif (!isset($_POST["u_email"]) || trim($_POST["u_email"]) == "") {
+				
+				exit("Empty email!");
 			
-			populate_gbook();
+			} elseif(!isset($_POST["u_msg"]) || trim($_POST["u_msg"]) == "") {
+				
+				exit("Empty message!");
+			} 			
 
-		} elseif(strtoupper($_POST["captcha"]) != $_SESSION['captcha_id']) {
-			exit("Invalid captcha");
 
-		} elseif($_POST["u_name"]) {
-			$name = $_POST["u_name"];
-			$email = $_POST["u_email"];
-			$message = $_POST["u_msg"];
+			$name = htmlspecialchars(stripslashes(trim($_POST["u_name"])));
+			$email = htmlspecialchars(stripslashes(trim($_POST["u_email"])));
+			$message = htmlspecialchars(stripslashes(trim($_POST["u_msg"])));
+
+			if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+ 				exit("Invalid email!");
+			}
+
+			if(!preg_match("/^[a-z0-9]/i", $name)) {
+				exit("Invalid name!");
+			}
 
 			$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
      
@@ -39,11 +57,6 @@
 		    $stmt->bindParam(':message', $message, PDO::PARAM_STR);
 		 
 		    /*** run the sql statement ***/
-		    if ($stmt->execute()) {
-		        populate_gbook();
-		    }
+		    $stmt->execute();
 		}
-	} else {
-		
 	}
-	

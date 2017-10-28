@@ -43,15 +43,23 @@ $(function() {
 		},
 
 		submitHandler: function() {
+
+			// var info = {
+			// 	"u_name" : "*qqqq!", //$("#u_name").val(),
+			// 	"u_email": $("#u_email").val(),
+			// 	"u_msg": $("#u_msg").val(),
+			// 	"captcha": $("#captcha").val(),
+			// };
+
 			$.ajax({
 						type: "POST",
 						url: "process.php",
 						data: $("#message_form").serialize(),
 						success: function(response) {
-							$("#feedback").hide('slow');
+							$("#message_form")[0].reset();
 							$.fancybox.close();
-							$("#message_form_success").html(response);
-		
+							table.ajax.reload();
+								
 						}
 			});
 		},
